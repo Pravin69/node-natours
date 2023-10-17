@@ -1,0 +1,54 @@
+extends base
+
+//- With extends, we will be able to use the same base layout for every single page that we want to render. Now, of course, we want to load different content for different pages. And to start, we want to have a overview page with all the tours, and then a page with all the tour details for one specific tour. And we will pass in the title of the page. In each of these templates, and in this case here the overview, we only want to put the content for that specific page. So we want no footer here and no header and none of the stuff that we have in the base. So, again, really just the content for the overview page. So that's exactly what we're going to put in this file, and then, we will basically inject this content into the base template, which we can call the parent template. This process is then called extending. 
+
+//- So whenever the overview template is rendered, we then take the base template and fill it up with the content of this file, and so we extend it. First off, in the base, we need to put a block. And that block, I'm going to call it content. Then inside that block, we can actually also have some content. So let's just put a h1 here. But this content will then later be overwritten. and now we can go to our overview page and say that we want to extend our base template. So, extend base. Or actually, that's called extends. So this file extends the base file. And of course, if this one here would be called, for example, index.pug, then here we would say extends index. 
+
+//- Now what exactly is the content that's going to be extended in the base template? Well, that's whatever we put in the content block. So, also here, we create a block called content. And then in there, we can as always put our content. Here, we basically redefine the content block that is in the base. So again, we have this block here which is called content, and now by putting the same content block right here in this page, which is then extending the base, we are basically redefining that block. Each file can only extend one other file. So we can only extend the base here, but we can have different blocks in each of the files.
+
+//- That allows us to then use here in our route the overview and the tour templates instead of using base. Remember that here we have the title All Tours on the overview, and then on the tour, we have The Forest Hiker. So let's actually put that on the title. In fact, we can actually do that right here in the base template. So when right here in the overview we extend the base template, the base template still has access to the locals, so, to the variables, that we passed into the template. Here, we can do what we did before, so, interpolation with the variable, so with the local. So, all we need to do is put the title here, like this.
+
+block content 
+   main.main
+      .card-container
+         each tour in tours
+            .card
+               .card__header
+                  .card__picture
+                     .card__picture-overlay &nbsp;
+                     img.card__picture-img(src=`img/tours/${tour.imageCover}`, alt=`${tour.name}`)
+                  h3.heading-tertirary
+                     span=tour.name
+
+               .card__details
+                  h4.card__sub-heading=`${tour.difficulty} ${tour.duration}-day tour`
+                  p.card__text=tour.summary
+                  .card__data
+                     svg.card__icon
+                        use(xlink:href='img/icons.svg#icon-map-pin')
+                     span=tour.startLocation.description
+                  .card__data
+                     svg.card__icon
+                        use(xlink:href='img/icons.svg#icon-calendar')
+                     span=tour.startDates[0].toLocaleString('en-us', {month: 'long', year: 'numeric'})
+                  .card__data
+                     svg.card__icon
+                        use(xlink:href='img/icons.svg#icon-flag')
+                     span=`${tour.locations.length} stops`
+                  .card__data
+                     svg.card__icon
+                        use(xlink:href='img/icons.svg#icon-user')
+                     span=`${tour.maxGroupSize} people`
+
+               .card__footer
+                  p
+                     span.card__footer-value=`$${tour.price}`
+                     | 
+                     span.card__footer-text per person
+                  p.card__ratings
+                     span.card__footer-value=tour.ratingsAverage
+                     | 
+                     span.card__footer-text=`rating (${tour.ratingsQuantity})`
+                  a.btn.btn--green.btn--small(href=`/tour/${tour.slug}`) Details
+
+
