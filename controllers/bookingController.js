@@ -1,6 +1,7 @@
 const stripeLib = require('stripe');
 const catchAsync = require('../utils/catchAsync');
 const Tour = require('../models/tourModel');
+const User = require('../models/userModel');
 const Booking = require('../models/bookingModel');
 const factory = require('../controllers/handlerFactory');
 const AppError = require('../utils/appError');
@@ -16,13 +17,13 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
   const tour = await Tour.findById(req.params.tourId);
 
+  if (!tour) return next(new AppError('Tour not found!', 404));
+
   // 2) Create checkout session
   const stripe = stripeLib(process.env.STRIPE_SECRET_KEY);
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/?tour=${
-      req.params.tourId
-    }&user=${req.user.id}&price=${tour.price}`,
+    success_url: `${req.protocol}://${req.get('host')}/my-tours`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
@@ -36,7 +37,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
             name: `${tour.name} Tour`,
             description: tour.summary,
             images: [
-              `https://natours-ijrr.onrender.com/img/tours/${tour.imageCover}`,
+              `${req.protocol}://${req.get('host')}/img/tours/${
+                tour.imageCover
+              }`,
             ],
           },
         },
@@ -59,20 +62,45 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 // At this point all we want to do here is create that new document, okay? Next up we could then say next, like this. And so that would then go the next middleware but that's not really ideal. So again keep in mind that the next middleware in the stack is of course this one and the get overview. So basically the function that it's going to render our page. But remember that this url is all of this. So all this with all this data here. And so again that's not secure at all. And so at least let's make it a little bit more secure, all right? And so what we can do here is to basically redirect the application now to only this url. And so basically you're removing the query string from the original url. And so actually we're now going to use something we never used before. So now what we want is the entire url, but without the query string. So what we're doing is request .theoriginalurl, which we already used before. And so that's the entire url basically from which the request came. And so now what we need to do is to split it by the question mark. Right? Because that's the divider between the part that we actually want and the query string. So if we split this by the question mark, then we will have an array where the first element is this and the second element is all of the rest. And so here we take the first element and so that is then our homepage. So our root url. And what redirect here does is basically to create a new request but to this new url that we passed in there. All right? So this will now create yet another request to our root url. So we're again gonna hit this route. And so once more we will hit this middleware here. So the one that we're just creating. So for the second time we're going to be hitting that but now the tour, user, and price are no longer defined. And so then we will go to the next middleware, which finally is the get overview handler function, which then we'll just render the homepage, okay?
 
 // Made sense? So let's just again take a minute to recap what we did here. So basically we added all the variables that we need to create a new booking to the success url. Then we added a new middleware function here to the stack of that exact route. So this one here. And so like this whenever this url here is hit we will attempt to create a new booking. All right? But that new booking is of course only created when the tour, user, and price are specified in the query. And so in this middleware function, if they are specified on the query well then we create a new booking in here. Then after that is done we remove the query string from the url in order to make the whole process a bit less transparent for the user. Basically so that whole query string doesn't show up in our browser's url bar. And then down here we redirect our application to this new route url here, okay? And so this way this middleware here will be skipped and then our normal homepage will simply get rendered.
-exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+exports.createBookingCheckout = async (session) => {
   // This is only TEMPORARY, because it's INSECURE everyone can make bookings without paying
-  const { tour, user, price } = req.query;
+  //   const { tour, user, price } = req.query;
 
-  if (!tour || !user || !price) return next();
+  //   if (!tour || !user || !price) return next();
 
-  await Booking.create({
-    tour,
-    user,
-    price,
-  });
+  //   await Booking.create({
+  //     tour,
+  //     user,
+  //     price,
+  //   });
 
-  res.redirect(req.originalUrl.split('?')[0]);
-});
+  //   res.redirect(req.originalUrl.split('?')[0]);
+
+  const tour = session.client_reference_id;
+  const user = (await User.findOne({ email: session.customer_email }))._id;
+  const price = session.unit_amount / 100;
+  await Booking.create({ tour, user, price });
+};
+
+// Stripe WebHooks: Once more, all of this code here will run whenever a payment was successful. Stripe will then call our webhook, which is the URL, which is going to call this function. And so, this function receives a body from the request, and then together with the signature and/or webhook secret, creates an event, which will contain the session. And then using that session data, we can create our new booking in the database.
+exports.webhookCheckout = (req, res, next) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.WEBHOOK_SECRET,
+    );
+  } catch (err) {
+    return res.status(400).send(`Webhook Error ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed')
+    createBookingCheckout(event.data.object);
+
+  res.status(200).json({ received: true });
+};
 
 exports.createBooking = factory.createOne(Booking);
 exports.getBooking = factory.getOne(Booking);

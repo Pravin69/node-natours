@@ -16,6 +16,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 const viewRouter = require('./routes/viewRoutes');
 
 // // It's kind of a convention to have all the Express configuration in app.js. I'm going to require of course, the Express package. We have Express imported, and now what we do is to create a variable called app. Again, that's kind of a standard. So app and assigned result of calling express. That's actually it. This here is a function which upon calling will add a bunch of methods to our app variable here. The first one that we're going to use is actually app.listen to basically start up a server. That is a bit similar to what we did before with the http package in the previous sections, right. So again, keep in mind that Express is 100% nodeJS under the hood, and some of the things work in a very similar way here in Express. All right, again, it simply makes our lives a bit easier by taking some of the complexity away from us.
@@ -197,6 +198,12 @@ const limiter = rateLimit({
 });
 
 app.use('/api', limiter);
+
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout,
+);
 
 // Body parser, reading data from body into req.body
 // We can limit the amount of data that comes in the body. Remember that? So, here in json, we can actually specify some options and for that as always we pass an object. And so we here can say, limit and let's limit it to 10 kilobyte, okay. And so the package will then understand it will parse this string here into a meaningful data, all right? And so now when we have a body larger than 10 kilobyte it will basically not be accepted, all right.
