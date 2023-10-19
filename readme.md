@@ -4,7 +4,7 @@
 
 ### Deployed Version
 
-Live demo (Feel free to visit) 👉 : [Natours](https://natours-ijrr.onrender.com/)
+Live demo (Feel free to visit) 👉 : [Natours](https://node-natours-cnfv.onrender.com/)
 
 ### Key Features
 
@@ -75,4 +75,4 @@ API Features:
 ### Deployment
 
 The website is deployed with Git into render:
-https://natours-ijrr.onrender.com/
+https://node-natours-cnfv.onrender.com/
