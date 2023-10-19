@@ -77,8 +77,8 @@ exports.createBookingCheckout = async (session) => {
   //   res.redirect(req.originalUrl.split('?')[0]);
 
   const tour = session.client_reference_id;
-  const user = (await User.findOne({ email: session.customer_email }))._id;
-  const price = session.unit_amount / 100;
+  const user = (await User.findOne({ email: session.customer_email })).id;
+  const price = session.display_items[0].unit_amount / 100;
   await Booking.create({ tour, user, price });
 };
 
