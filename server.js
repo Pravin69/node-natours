@@ -76,3 +76,10 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 // console.log(x);
+// Responding to SIGTERM Signal: So a Heroku dyno, and again a dyno is just a name that Heroku uses for basically a container in which your application is running so these dynos restart every 24 hours in order to keep your app in a healthy state. Okay? And the way that Heroku does this is by sending the so-called "sick term signal" to our note application, and the application will then basically shut down immediately. All right? Now, the problem with this is that the shut down can be very abrupt. So this can then leave requests that are currently being processed basically hanging in the air, and so that's not ideal. So basically that's what happens also when there is an unhandled rejection. So here in our server, dot JS, remember how we actually gracefully shut down the server whenever there was an unhandled rejection. All right? So now we're actually gonna do something very similar when we receive the "sick term signal".
+process.on('SIGTERM', () => {
+  console.log('👋SIGTERM received. Shutting down gracefully');
+  server.close(() => {
+    console.log('💥 Process terminated!');
+  });
+});
