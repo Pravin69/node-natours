@@ -1232,6 +1232,58 @@ body {
   border-radius: 5px;
 }
 
+@media (max-width: 32em) {
+  .login-form {
+    padding: 5rem 1.2rem;
+  }
+}
+
+.signup-form {
+  margin: 0 auto;
+  max-width: 55rem;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  padding: 5rem 7rem;
+  border-radius: 5px;
+}
+
+.resetPassword-form {
+  margin: 0 auto;
+  max-width: 55rem;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  padding: 5rem 7rem;
+  border-radius: 5px;
+}
+
+.forgotPassword-form {
+  margin: 0 auto;
+  max-width: 55rem;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.06);
+  padding: 5rem 7rem;
+  border-radius: 5px;
+}
+
+.forgot-password-link {
+  margin-left: 6px;
+}
+
+@media (max-width: 32em) {
+  .resetPasswordForm-form {
+    padding: 5rem 1.2rem;
+  }
+}
+
+@media (max-width: 32em) {
+  .signup-form {
+    padding: 5rem 1.2rem;
+  }
+}
+
 .form__input {
   display: block;
   font-family: inherit;
@@ -1322,4 +1374,43 @@ body {
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
+}
+
+.dark-mode-toggle {
+  background-color: transparent;
+  border: none;
+  position: relative;
+  width: 32px;
+  height: 32px;
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.dark-mode-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #777;
+  border: 2px solid #777;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.dark-mode-toggle.active .dark-mode-indicator {
+  background-color: #f1c40f;
+  border-color: #f1c40f;
+}
+
+.dark-mode-stripe {
+  background-color: #1a1a1a; /* Adjust background color to match your dark mode theme */
+  color: #fff; /* Adjust text color to match your dark mode theme */
+  /* Add additional styles as needed */
+}
+
+.form__reset {
+  font-size: 1.5rem;
+  font-weight: 600;
 }

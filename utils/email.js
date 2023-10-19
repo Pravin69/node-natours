@@ -22,13 +22,13 @@ module.exports = class Email {
 
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
-      // SEND GRID
+      // ELASTIC EMAIL
       return nodemailer.createTransport({
-        host: process.env.RESEND_HOST,
-        port: process.env.RESEND_PORT,
+        host: process.env.EMAIL_API_HOST,
+        port: process.env.EMAIL_API_PORT,
         auth: {
-          user: process.env.RESEND_USERNAME,
-          pass: process.env.RESEND_PASSWORD,
+          user: process.env.EMAIL_API_USERNAME,
+          pass: process.env.EMAIL_API_PASSWORD,
         },
       });
     }

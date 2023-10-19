@@ -4,18 +4,70 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime.js';
 
 import { login, logout } from './login';
+import { forgotPassword } from './forgotPassword';
+import { resetPassword } from './resetPassword';
+import { signUp } from './signUp';
 import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';
 import { bookTour } from './stripe';
+
+import {
+  enable as enableDarkMode,
+  disable as disableDarkMode,
+  auto as followSystemColorScheme,
+  exportGeneratedCSS as collectCSS,
+  isEnabled as isDarkReaderEnabled,
+} from 'darkreader';
 
 // DOM elements
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
 const logOutBtn = document.querySelector('.nav__el--logout');
+
+const signupForm = document.querySelector('.form--signup');
+
+const resetPasswordForm = document.querySelector('.form--resetPassword');
+const forgotPasswordForm = document.querySelector('.form--forgotPassword');
+
 const userDataForm = document.querySelector('.form-user-data');
 const userPasswordForm = document.querySelector('.form-user-password');
 const fileInput = document.querySelector('.form__upload');
 const bookBtn = document.getElementById('book-tour');
+
+const darkModeButton = document.getElementById('dark-mode-button');
+
+// Retrieve user preference from localStorage
+const userPreference = localStorage.getItem('darkMode');
+
+if (userPreference === 'enabled') {
+  enableDarkMode({
+    brightness: 100,
+    contrast: 90,
+    sepia: 10,
+  });
+  darkModeButton.classList.add('active');
+}
+
+darkModeButton.addEventListener('click', toggleDarkMode);
+
+function toggleDarkMode() {
+  console.log('Dark mode clicked');
+  if (isDarkReaderEnabled()) {
+    disableDarkMode();
+    darkModeButton.classList.remove('active');
+    // Remove user preference from localStorage
+    localStorage.removeItem('darkMode');
+  } else {
+    enableDarkMode({
+      brightness: 100,
+      contrast: 90,
+      sepia: 10,
+    });
+    darkModeButton.classList.add('active');
+    // Save user preference to localStorage
+    localStorage.setItem('darkMode', 'enabled');
+  }
+}
 
 // Delegation
 if (mapBox) {
@@ -24,6 +76,47 @@ if (mapBox) {
   );
 
   displayMap(locations);
+}
+
+if (signupForm) {
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    document.querySelector('.btn--green').textContent = 'Loading...';
+
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const password_confirm = document.getElementById('password-confirm').value;
+    await signUp(name, email, password, password_confirm);
+
+    document.querySelector('.btn--green').textContent = 'Signup';
+  });
+}
+
+if (forgotPasswordForm) {
+  forgotPasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    await forgotPassword(email);
+  });
+}
+
+if (resetPasswordForm) {
+  resetPasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('password').value;
+    const password_confirm = document.getElementById('password-confirm').value;
+
+    const url = window.location.href;
+    const regex = /\/resetPassword\/(.+)/;
+    const match = url.match(regex);
+    const token = match ? match[1] : null;
+
+    console.log(token);
+
+    await resetPassword(password, password_confirm, token);
+  });
 }
 
 if (loginForm) {

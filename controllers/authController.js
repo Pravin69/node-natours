@@ -116,6 +116,7 @@ exports.logout = (req, res) => {
 
   res.status(200).json({
     status: 'success',
+    message: 'You have been logged out',
   });
 };
 
@@ -157,11 +158,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //   console.log(token);
 
-  if (!token) {
-    return next(
-      new AppError('You are not logged in! Please log in to get access.', 401),
-    );
-  }
+  if (!token) return res.redirect('/');
 
   // 2) Validate token
   const decoded = await util.promisify(jwt.verify)(
@@ -192,30 +189,34 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 // Only for rendered pages, no errors
 exports.isLoggedIn = catchAsync(async (req, res, next) => {
-  if (req.cookies.jwt) {
-    if (req.cookies.jwt === 'loggedout') return next();
+  try {
+    if (req.cookies.jwt) {
+      if (req.cookies.jwt === 'loggedout') return next();
 
-    // 2) Validate token
-    const decoded = await util.promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET,
-    );
+      // 2) Validate token
+      const decoded = await util.promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET,
+      );
 
-    // 3) Check if user still exists
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
-      return next();
+      // 3) Check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 4) Check if user changed password after the token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // There is a logged in user
+      res.locals.user = currentUser;
     }
-
-    // 4) Check if user changed password after the token was issued
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      return next();
-    }
-
-    // There is a logged in user
-    res.locals.user = currentUser;
+    next();
+  } catch (err) {
+    return next();
   }
-  next();
 });
 
 // Authorization (User Roles and Permission) : However, sometimes, simply authenticating, so, logging a user in, is really not enough. And, so in this video, we're gonna implement authorization as well. So, imagine the act of deleting a tour from our database. So, not every user should, of course, be allowed to do that. Even if the user is logged in, right? So, we basically need to authorize only certain types of users, to perform certain actions. And so that's exactly what authorization is. It's verifying if a certain user has the rights to interact with a certain resource. So, again, with authorization we basically check if a certain user is allowed to access a certain resource, even if he is logged in. So not all logged in users will be able to perform the same actions in our API, all right? And this is a very common scenario that should be implemented in each and every web application usually, all right? So we're gonna build another middleware function here, this time to restrict certain routes.
@@ -270,7 +271,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     // 3) Send it to the user's email
     const resetURL = `${req.protocol}://${req.get(
       'host',
-    )}/api/v1/users/resetPassword/${resetToken}`;
+    )}/resetPassword/${resetToken}`;
 
     //  await sendEmail({
     //    email: user.email,
