@@ -67,10 +67,10 @@ Before using the API, you need to set the variables in Postman depending on your
 
 API Features:
 
-- Tours List 👉 [Tours](https://natours-ijrr.onrender.com/api/v1/tours)
-- Tours State 👉 [Tour Stats](https://natours-ijrr.onrender.com/v1/tours/tour-stats)
-- Get Top 5 Cheap Tours 👉 [Top 5 Cheap Tours](https://natours-ijrr.onrender.com/api/v1/tours/top-5-cheap)
-- Get Tours Within Radius 👉 [Tours Within Radius](https://natours-ijrr.onrender.com/api/v1/tours/tours-within/200/center/34.098453,-118.096327/unit/mi)
+- Tours List 👉 [Tours](https://node-natours-cnfv.onrender.com/api/v1/tours)
+- Tours State 👉 [Tour Stats](https://node-natours-cnfv.onrender.com/v1/tours/tour-stats)
+- Get Top 5 Cheap Tours 👉 [Top 5 Cheap Tours](https://node-natours-cnfv.onrender.com/api/v1/tours/top-5-cheap)
+- Get Tours Within Radius 👉 [Tours Within Radius](https://node-natours-cnfv.onrender.com/api/v1/tours/tours-within/200/center/34.098453,-118.096327/unit/mi)
 
 ### Deployment
 
