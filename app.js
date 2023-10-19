@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -211,6 +212,9 @@ app.use(
     ],
   }),
 );
+
+// Text Compression : And the first thing that I want to do is to install a package that's gonna compress all our responses. So basically, whenever we send a text response to a client, no matter if that's JSON or HTML code. With the compression package, that text will then be dramatically compressed.
+app.use(compression());
 
 // Creating our own Middleware: In each middleware function, we have access to the request and the response, okay? But also, we have the next function. And so, just like this, we add  a third argument to this middleware function, okay? And like this, express then knows that we are actually defining a middleware here. What matters is that it's the third argument to this function. So express basically passes the next function as the third argument into this middleware function. And we can then call it whatever we want. But again, next is really the convention in express, and in order to avoid confusion.
 

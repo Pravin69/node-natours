@@ -19,6 +19,7 @@
   "dependencies": {
     "axios": "^1.5.1",
     "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "core-js": "^3.33.0",
     "darkreader": "^4.9.67",

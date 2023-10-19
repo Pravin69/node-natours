@@ -51,7 +51,7 @@ if (userPreference === 'enabled') {
 darkModeButton.addEventListener('click', toggleDarkMode);
 
 function toggleDarkMode() {
-  console.log('Dark mode clicked');
+  //   console.log('Dark mode clicked');
   if (isDarkReaderEnabled()) {
     disableDarkMode();
     darkModeButton.classList.remove('active');
@@ -113,7 +113,7 @@ if (resetPasswordForm) {
     const match = url.match(regex);
     const token = match ? match[1] : null;
 
-    console.log(token);
+    //  console.log(token);
 
     await resetPassword(password, password_confirm, token);
   });
