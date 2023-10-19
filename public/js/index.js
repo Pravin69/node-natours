@@ -237,4 +237,4 @@ if (bookBtn) {
 
 const alertMessage = document.querySelector('body').dataset.alert;
 
-if (alert) showAlert('success', alertMessage);
+if (alertMessage) showAlert('success', alertMessage);
