@@ -659,6 +659,6 @@ await iq(n,"Data");//  const userUploadedFile = form.get('photo');
 //    console.log('👛', userUploadedFile, 'You have changed your picture');
 //  }
 }),iX&&iX.addEventListener("submit",e=>{e.preventDefault();let t=document.querySelector(".btn--save-password");t.textContent="Updating...",iq({passwordCurrent:document.getElementById("password-current").value,password:document.getElementById("password").value,passwordConfirm:document.getElementById("password-confirm").value},"Password"),t.textContent="Save password",iX.reset()}),iZ&&iZ.addEventListener("change",async e=>{let t=new FormData;t.append("photo",document.getElementById("photo").files[0]);// Take care of the type attribute being photo
-let r=await iq(t,"Photo");r&&(document.querySelector(".nav__user-img").setAttribute("src",`/img/users/${r}`),document.querySelector(".form__user-photo").setAttribute("src",`/img/users/${r}`))}),i0&&i0.addEventListener("click",e=>{e.target.textContent="Processing...";let{tourId:t}=e.target.dataset;iH(t)});let i6=document.querySelector("body").dataset.alert;alert&&iM("success",i6)}();//# sourceMappingURL=index.js.map
+let r=await iq(t,"Photo");r&&(document.querySelector(".nav__user-img").setAttribute("src",`/img/users/${r}`),document.querySelector(".form__user-photo").setAttribute("src",`/img/users/${r}`))}),i0&&i0.addEventListener("click",e=>{e.target.textContent="Processing...";let{tourId:t}=e.target.dataset;iH(t)});let i6=document.querySelector("body").dataset.alert;i6&&iM("success",i6)}();//# sourceMappingURL=index.js.map
 
 //# sourceMappingURL=index.js.map
