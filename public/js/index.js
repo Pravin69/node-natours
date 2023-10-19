@@ -10,6 +10,7 @@ import { signUp } from './signUp';
 import { updateSettings } from './updateSettings';
 import { displayMap } from './mapbox';
 import { bookTour } from './stripe';
+import { showAlert } from './alert';
 
 import {
   enable as enableDarkMode,
@@ -233,3 +234,7 @@ if (bookBtn) {
     bookTour(tourId);
   });
 }
+
+const alertMessage = document.querySelector('body').dataset.alert;
+
+if (alert) showAlert('success', alertMessage);
