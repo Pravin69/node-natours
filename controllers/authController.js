@@ -14,7 +14,7 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
 
   // Sending JWT via Cookie : So we learned in the last lecture that the JSON web token should be stored in a secure HTTP-only cookie. But right now, we're only sending the token as a simple string in our JSON response. So in this video, let's also send the token as a cookie, so that the browser can then save it in this more secure way. So we're in our code. Do we actually send the token to the client? Well, remember, that's in the authController and right here in the createSendToken function. So first of all, a cookie is basically just a small piece of text that a server can send to clients. Then when the client receives a cookie, it will automatically store it and then automatically send it back along with all future requests to the same server. All right, so again, a browser automatically stores a cookie that it receives and sends it back in all future requests to that server where it came from. So in order to send a cookie, it's actually very easy. All we have to do is to basically attach it to the response object. So we say res.cookie and then all we have to do is to specify the name of the cookie, and I'm calling it JSON web token, then the data that we actually want to send in the cookie, and so that's of course gonna be the token variable and then after that, a couple of options for the cookie. And the first option that we're gonna specify is the expires property. Okay, so basically, this expires property will make it so that the browser or the client in general will delete the cookie after it has expired. Okay, and so we set the expiration date similar to the one that we set in the JSON web token, okay. So let's actually create a new variable for that, okay, because the JSON web token package can then work with this format. and so instead, let's create a variable with a real number. So let's call it still JWT, then cookie, expires in, and we still set it to 90, so 90 days, but again, without the D. Okay, so that now we can make actually operations with it because we will need to convert it to milliseconds, okay.
@@ -25,9 +25,14 @@ const createSendToken = (user, statusCode, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
+    secure: req.secure || req.headers('x-forwarded-proto') === 'https',
   };
 
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  //   Testing for secure HTTPS: So, let's go here to our authentication controller. And right here at the top, in this create sent token function, here is the place where we set the adjacent web cookie to secure, if we are currently in production. Remember that. So, remember that we created this function with JSON response, it also sends a cookie, which also contains the JSON web token. And that cookie has a couple of options. The first one, when it expires. The second one, that it can only be accessed via http basically. And then, when we're in production, we said that this cookie can only be sent on a secure connection. So, basically, on an https connection. All right. Now, the problem with that is that actually, the fact that we are in production, does not mean that connection is actually secure. Right? Because of course, not all deployed applications are automatically set to https. And so we need to change this if that we have here. All right. Now, in express we actually have a secure property that is on the request. And only when the connection is secure, then this request dot secure is true. Okay? Makes sense, right? Now the problem is, that actually in Heroku, this doesn't work. And that's because Heroku proxy's, so basically redirect or modifies all incoming requests into our application before they actually reach the app. All right. So, in order to make this also work on Heroku we need to also test if the x forward proto header is set to https.
+
+  //   So, if either req.secure is true, or if this header here is set to https, then we want the secure options here set to true. However, right now, this is still not going to be working, because there's just one more thing that we need to do, which is basically to make our application trust proxy's. So, again, request dot secure doesn't work in the first place because Heroku acts as a proxy, which kind of redirects and modifies incoming requests. And, so, we need to go to app dot JS and then right after this one here, let's now trust proxy's. And we do that by saying app dot enable trust proxy.
+  //   cookieOptions.secure =
+  //     req.secure || req.headers('x-forwarded-proto') === 'https';
 
   res.cookie('jwt', token, cookieOptions);
 
@@ -65,7 +70,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
 
   // So these options as always, we passed them in as an object and then let's specify the expires in, so expires in and then process dot end and then JWT expires in, okay, and this here will then add some additional data to the payload, but that's of course no problem at all. So we just created a token, now all we need to do, is to send it to the client.
 
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
   // const token = signToken(newUser._id);
   // res.status(201).json({
   //   status: 'success',
@@ -100,7 +105,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If everything ok, send token to client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
   // const token = signToken(user._id);
   // res.status(200).json({
   //   status: 'success',
@@ -333,7 +338,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update changedPasswordAt property for the user
 
   // 4) Log the user in, send JWT
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
   // const token = signToken(user._id);
 
   // res.status(200).json({
@@ -362,5 +367,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 4) Log user in and send JWT
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
