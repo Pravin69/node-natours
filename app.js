@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -30,6 +31,17 @@ app.enable('trust proxy');
 // So we shouldn't use dot here, but we should instead use the directory name variable. So let's do that, and together with a nice trick that we can use with Note, which is using the path module. Path is a built-in Note module, so a core module, which is used to manipulate path names, basically. So require path, so of course we don't have to install anything. It's just a native built-in module. What we can now do is path.join, and then the directory name, and then views. This will then, basically behind the scenes, create a path joining the directory name /views. Now it might seem here a bit overkill to use this path.join function here, but we don't always know whether a path that we receive from somewhere already has a slash or not. So you will see this function here used all the time in order to prevent this kind of bug. Because this way we don't even need to think about any slashes or not, because Node will automatically create a correct path.
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
+
+// Implementing CORS:
+app.use(cors());
+// Access-Control-Allow-Origin *
+// api: api.natours.com, front-end: natours.com
+// app.use(cors({
+//    origin: ['https://www.natours.com'],
+// }))
+
+app.options('*', cors());
+// app.options('/api/v1/tours/:id', cors())
 
 // app.get('/', (req, res) => {
 //   res

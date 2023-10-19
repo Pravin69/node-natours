@@ -23,6 +23,7 @@
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "core-js": "^3.33.0",
+    "cors": "^2.8.5",
     "darkreader": "^4.9.67",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
@@ -61,6 +62,6 @@
     "prettier": "^3.0.3"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "^18"
   }
 }
