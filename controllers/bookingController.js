@@ -12,6 +12,8 @@ const AppError = require('../utils/appError');
 
 // So we cannot make up our own fields. So if you try to do that, you will really get some error. Then we can also specify an array of images. Now these images here they need to be live images. So basically images that are hosted on the internet because Stripe will actually upload this image to their own server. And so this is another of the things that we can only really do once the website is deployed. So this is one more thing that we actually need to change once we put our website into production. Anyway, next up is the amount. So basically the price of the product that is being purchased. So that is tour.price and now we need to multiply that by 100. Because this amount is expected to be in cents. And so one dollar or one Euro or really most of the currencies have 100 cents. So one dollar equals 100 cents. And so to convert it to cents, just multiply it by 100. Then we also need to specify the currency. And so that's in this case USD. But it could also be like, for Euro it's EUR and for other currencies, you should probably take a look at the documentation. Anyway, finally we also specify the quantity. And so that's just one tour in this case. So that's actually it. And so basically this part here is the information about the session itself. And then here is the information about the product that the user is about to purchase. All right, now let's actually store the session. So this create here basically returns a promise because setting all these options here will basically do an API call to Stripe and so then of course that's an asynchronous function that we should await here. So as always, the status is success. And then let's simply send the session like this. And so we're missing the second step where we then actually charge the credit card on the client side.
 
+const stripe = stripeLib(process.env.STRIPE_SECRET_KEY);
+
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
 
@@ -20,7 +22,6 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   if (!tour) return next(new AppError('Tour not found!', 404));
 
   // 2) Create checkout session
-  const stripe = stripeLib(process.env.STRIPE_SECRET_KEY);
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     success_url: `${req.protocol}://${req.get('host')}/my-tours?alert=booking`,
